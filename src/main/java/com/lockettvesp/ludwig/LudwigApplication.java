@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 public class LudwigApplication {
 
 	public static void main(String[] args) {
-		log.info("Starting Ludwig Application"  );
+		log.info("Starting Ludwig Application" );
 		SpringApplication.run(LudwigApplication.class, args);
 	}
 
