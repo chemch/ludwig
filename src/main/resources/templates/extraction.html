@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Ludwig</title>
+    <link rel="stylesheet" th:href="@{/styles.css}" />
+</head>
+
+<body>
+<h1>Extraction:</h1>
+<form method="POST" th:object="${extraction}">
+
+    <span class="validationError"
+          th:if="${#fields.hasErrors('id')}"
+          th:errors="*{id.toString()}">ID Error</span>
+
+    <div class="grid">
+        <h3>Artifact:</h3>
+        <div th:each="command : ${commands}">
+            <input name="commandType" type="radio" th:value="${command.getCommandType()}" />
+            <span th:text="${command.description}">COMMAND</span><br/>
+        </div>
+    </div>
+    <br/>
+    
+    <div class="grid">
+        <h3>Operator:</h3>
+        <div th:each="operator : ${operators}">
+            <input name="operator" type="radio" th:value="${operator.callSign}" />
+            <span th:text="${operator.callSign}">OPERATOR</span><br/>
+        </div>
+    </div>
+    <br/>
+    
+        <div class="grid">
+        <h3>Source:</h3>
+        <div th:each="source : ${sources}">
+            <input name="source" type="radio" th:value="${{source.ipAddress}{source.ipAddress}}" />
+            <span th:text="${source.sourceType}">SOURCE</span><br/>
+        </div>
+    </div>
+    <br/>
+
+
+    <div>
+        <h3>Title:</h3>
+        <input type="text" th:field="*{title}"/>
+        <span class="validationError"
+              th:if="${#fields.hasErrors('title')}"
+              th:errors="*{title}">Title Error</span>
+         <br/><br/>
+        <button>Submit</button>
+    </div>
+    
+</form>
+</body>
+</html>
