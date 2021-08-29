@@ -35,13 +35,14 @@ public class ExtractionController {
        );
        
        List<Source> sources = Arrays.asList(
-               new Source(SourceType.SERVER, "192.168.1.2"),
+               new Source(SourceType.WORKSTATION, "192.168.1.1"),
                new Source(SourceType.SERVER, "192.168.1.2")
        );
-     
+       // load model values
        model.addAttribute("commands", commands);
        model.addAttribute("operators", operators);
        model.addAttribute("sources", sources);
+       // add extraction to build
        model.addAttribute("extraction", new Extraction());
        return "extraction";
     }

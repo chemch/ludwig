@@ -18,7 +18,8 @@
     <div class="grid">
         <h3>Artifact:</h3>
         <div th:each="command : ${commands}">
-            <input name="commandType" type="radio" th:value="${command.getCommandType()}" />
+            <input name="command.commandType" type="hidden" th:value="${command.getCommandType()}" />
+            <input name="command.description" type="radio" th:value="${command.getDescription()}" />
             <span th:text="${command.description}">COMMAND</span><br/>
         </div>
     </div>
@@ -27,7 +28,7 @@
     <div class="grid">
         <h3>Operator:</h3>
         <div th:each="operator : ${operators}">
-            <input name="operator" type="radio" th:value="${operator.callSign}" />
+            <input name="operator.callSign" type="radio" th:value="${operator.callSign}" />
             <span th:text="${operator.callSign}">OPERATOR</span><br/>
         </div>
     </div>
@@ -36,8 +37,9 @@
         <div class="grid">
         <h3>Source:</h3>
         <div th:each="source : ${sources}">
-            <input name="source" type="radio" th:value="${{source.ipAddress}{source.ipAddress}}" />
-            <span th:text="${source.sourceType}">SOURCE</span><br/>
+            <input name="source.ipAddress" type="radio" th:value="${source.ipAddress}" />
+            <input type="hidden" name="source.sourceType" th:value="${source.sourceType}" />
+            <span th:text="${source.ipAddress}">SOURCE</span><br/>
         </div>
     </div>
     <br/>
