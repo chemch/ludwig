@@ -10,6 +10,5 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @RequiredArgsConstructor
 public class AmsiProviders extends BaseArtifact {
-    @SuppressWarnings("unused")
-	private final CommandType commandType = CommandType.AMSI_PROVIDERS;
+    private final CommandType commandType = CommandType.AMSI_PROVIDERS;
 }
