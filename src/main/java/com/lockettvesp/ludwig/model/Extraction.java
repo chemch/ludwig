@@ -14,6 +14,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
@@ -23,24 +25,22 @@ import javax.validation.constraints.Size;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name="Extraction")
+@Table(name="t_extraction")
 public class Extraction {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-    private Long id;
-    @NotNull
-    private LocalDateTime runDateTime = LocalDateTime.now();
+    private Long id; 
     @NotNull
     @Size(min=3, message="Title must be at least 3 characters")
     private String title;
     @NotNull
-    @OneToOne(targetEntity=Command.class)
+    @ManyToOne(targetEntity=Command.class)
     private Command command;
     @NotNull
-    @OneToOne(targetEntity=Operator.class)
+    @ManyToOne(targetEntity=Operator.class)
     private Operator operator;
     @NotNull
-    @OneToOne(targetEntity=Source.class)
+    @ManyToOne(targetEntity=Source.class)
     private Source source;
     private Date createdDate;
     
@@ -49,7 +49,7 @@ public class Extraction {
     	this.createdDate = new Date();
     }
    
-    public Extraction(String title, Command command, Operator operator, Source source){
+    public Extraction(String title, Command command, Operator operator, Source source) {
         this.title = title;
         this.command = command;
         this.operator = operator;

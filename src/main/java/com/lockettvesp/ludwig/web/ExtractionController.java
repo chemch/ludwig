@@ -9,8 +9,13 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 
 import com.lockettvesp.ludwig.data.CommandRepository;
+import com.lockettvesp.ludwig.data.ExtractionRepository;
+import com.lockettvesp.ludwig.data.OperatorRepository;
+import com.lockettvesp.ludwig.data.SourceRepository;
 import com.lockettvesp.ludwig.model.Command;
 import com.lockettvesp.ludwig.model.CommandType;
 import com.lockettvesp.ludwig.model.Extraction;
@@ -27,12 +32,19 @@ import javax.validation.Valid;
 @Slf4j
 @Controller
 @RequestMapping("/extraction")
+@SessionAttributes("extraction")
 public class ExtractionController {
 	private final CommandRepository commandRepo;
+	private final SourceRepository sourceRepo;
+	private final ExtractionRepository extractionRepo;
+	private final OperatorRepository operatorRepo;
 	
 	@Autowired
-	public ExtractionController(CommandRepository commandRepo) {
+	public ExtractionController(CommandRepository commandRepo, SourceRepository sourceRepo, ExtractionRepository extractionRepo, OperatorRepository operatorRepo) {
 		this.commandRepo = commandRepo;
+		this.sourceRepo = sourceRepo;
+		this.extractionRepo = extractionRepo;
+		this.operatorRepo = operatorRepo;
 	}
 	
     @GetMapping
@@ -40,31 +52,34 @@ public class ExtractionController {
     	// load available commands to run
     	List<Command> commands = new ArrayList<>();
     	commandRepo.findAll().forEach(i -> commands.add(i));
-    	
-       List<Operator> operators = Arrays.asList(
-               new Operator("ghost"),
-               new Operator("cartographer")
-       );
-       List<Source> sources = Arrays.asList(
-               new Source(SourceType.WORKSTATION, "192.168.1.1"),
-               new Source(SourceType.SERVER, "192.168.1.2")
-       );
-       // load model values
-       model.addAttribute("commands", commands);
-       model.addAttribute("operators", operators);
-       model.addAttribute("sources", sources);
-       // add extraction to build 
-       model.addAttribute("extraction", new Extraction());
-       return "extraction";
+    	// load operators that could run
+    	List<Operator> operators = new ArrayList<>();
+    	operatorRepo.findAll().forEach(i -> operators.add(i));
+    	// load potential sources for artifacts
+    	List<Source> sources = new ArrayList<>();
+   	   	sourceRepo.findAll().forEach(i -> sources.add(i));
+   	   	// load model values
+   	   	model.addAttribute("commands", commands);
+   	   	model.addAttribute("operators", operators);
+   	   	model.addAttribute("sources", sources);
+   	   	// add extraction to build 
+   	   	model.addAttribute("extraction", new Extraction());
+   	   	return "extraction";
     }
 
     @PostMapping
-    public String runExtraction(@Valid Extraction extraction, Errors errors) {
+    public String runExtraction(@Valid Extraction extraction, Errors errors, SessionStatus sessionStatus) {
     	if (errors.hasErrors()) {
     		log.error("Invalid Extraction Data" + extraction);
     		return "redirect:/extraction";
     	}
-        log.info("Running: " + extraction);
+        // save components and extraction
+        commandRepo.save(extraction.getCommand());
+        sourceRepo.save(extraction.getSource());
+        operatorRepo.save(extraction.getOperator());
+        extractionRepo.save(extraction);
+        log.info("Running - " + extraction);
+        sessionStatus.setComplete(); 
         return "redirect:/";
     }
 }
