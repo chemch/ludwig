@@ -16,13 +16,16 @@ import com.lockettvesp.ludwig.data.CommandRepository;
 import com.lockettvesp.ludwig.data.ExtractionRepository;
 import com.lockettvesp.ludwig.data.OperatorRepository;
 import com.lockettvesp.ludwig.data.SourceRepository;
+import com.lockettvesp.ludwig.data.UserRepository;
 import com.lockettvesp.ludwig.model.Command;
 import com.lockettvesp.ludwig.model.CommandType;
 import com.lockettvesp.ludwig.model.Extraction;
 import com.lockettvesp.ludwig.model.Operator;
 import com.lockettvesp.ludwig.model.Source;
 import com.lockettvesp.ludwig.model.SourceType;
+import com.lockettvesp.ludwig.model.User;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,22 +41,29 @@ public class ExtractionController {
 	private final SourceRepository sourceRepo;
 	private final ExtractionRepository extractionRepo;
 	private final OperatorRepository operatorRepo;
+	private UserRepository userRepo;
 	
 	@Autowired
-	public ExtractionController(CommandRepository commandRepo, SourceRepository sourceRepo, ExtractionRepository extractionRepo, OperatorRepository operatorRepo) {
+	public ExtractionController(CommandRepository commandRepo, SourceRepository sourceRepo, 
+			ExtractionRepository extractionRepo, OperatorRepository operatorRepo, UserRepository userRepo) {
 		this.commandRepo = commandRepo;
 		this.sourceRepo = sourceRepo;
 		this.extractionRepo = extractionRepo;
 		this.operatorRepo = operatorRepo;
+		this.userRepo = userRepo;
 	}
 	
     @GetMapping
-    public String showExtractionForm(Model model){
+    public String showExtractionForm(Model model, Principal principal){
+    	// get current user and set as the operator
+    	String username = principal.getName();
+    	User user = userRepo.findByUsername(username);
+    	List<Operator> operators = new ArrayList<>();
+    	operators.add(user);
     	// load available commands to run
     	List<Command> commands = new ArrayList<>();
     	commandRepo.findAll().forEach(i -> commands.add(i));
     	// load operators that could run
-    	List<Operator> operators = new ArrayList<>();
     	operatorRepo.findAll().forEach(i -> operators.add(i));
     	// load potential sources for artifacts
     	List<Source> sources = new ArrayList<>();
@@ -78,8 +88,9 @@ public class ExtractionController {
         sourceRepo.save(extraction.getSource());
         operatorRepo.save(extraction.getOperator());
         extractionRepo.save(extraction);
-        log.info("Running - " + extraction);
+        log.info("Recording - " + extraction);
         sessionStatus.setComplete(); 
-        return "redirect:/";
+        // send user to history page
+        return "redirect:/history";
     }
 }

@@ -23,8 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 @Table(name="t_command")
 public class Command {
 	@Id
-	//@GeneratedValue(strategy=GenerationType.AUTO)
-	//private Long id;
 	@NotNull
 	private String description;
 	@NotNull
